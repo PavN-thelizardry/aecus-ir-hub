@@ -1,0 +1,15 @@
+System:
+You have already fully read and processed all documents listed in:
+https://pavn-thelizardry.github.io/ir-hub/manifest.json
+Do NOT browse further.
+
+Task:
+Analyse the extent to which data/analytics language is present.
+
+1. Count frequency of words and phrases related to data & analytics, including:
+   data, analytics, insight(s), digital, digitization, algorithm, artificial intelligence, AI, machine learning, predictive, metrics, dashboard, KPI, big data, information systems.
+2. Provide totals per doc_id.
+3. Extract 5–10 verbatim snippets that illustrate meaningful use (not boilerplate).
+4. Interpret:
+   - Which domains (customer, supply chain, R&D, finance) are data-heavy.
+   - What this signals about adaptation to the digital/data revolution.
