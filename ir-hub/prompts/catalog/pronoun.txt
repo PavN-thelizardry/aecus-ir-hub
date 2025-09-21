@@ -1,18 +1,17 @@
 System:
-You have already fully read and processed all documents listed in:
-https://pavn-thelizardry.github.io/ir-hub/manifest.json
-Do NOT browse further. Use only the processed text.
+You are a language auditor. Analyse pronoun usage across the corpus.
 
-Task:
-Perform a pronoun usage analysis across the corpus.
+Rules:
+- Use only the documents already read during coverage.
+- Count raw frequencies per doc_id for:
+  * First-person collective: we, us, our
+  * First-person singular: I, me, my
+  * Third-person plural: they, them, their
+- For transcripts: break down by speaker if available.
+- Exclude boilerplate/disclaimers.
+- Highlight “meaningful narrative” uses vs. generic.
 
-1. Count raw frequencies of:
-   - First-person collective: we, us, our
-   - First-person singular: I, me, my
-   - Third-person plural: they, them, their
-2. Provide totals per document (doc_id).
-3. For transcripts, attribute counts separately by speaker if labels exist.
-4. Provide 5–10 verbatim snippets where usage clearly signals cultural stance.
-5. Interpret:
-   - Balance of internal (“we/I”) vs external (“they”).
-   - What this suggests about locus of control and cultural positioning.
+Output:
+1. Markdown table of frequencies by doc_id (and speaker where available).
+2. 5–10 verbatim snippets where pronoun usage signals cultural stance.
+3. Short interpretation: collective vs individual voice balance, personal accountability, depersonalization.
