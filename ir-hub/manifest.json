@@ -1,0 +1,49 @@
+{
+  "version": "1.0",
+  "generated_at": "2025-09-21T15:13:38.834Z",
+  "root": "https://pavn-thelizardry.github.io/aecus-ir-hub/",
+  "companies": [
+    {
+      "company": "OREP.PA",
+      "years": [
+        {
+          "year": 2024,
+          "docs": [
+            {
+              "doc_id": "orep-pa-2024-transc-orep-pa-04-06-24-ec-fy24",
+              "type": "transcript",
+              "title": "OREP.PA 04 06 24 EC fy24q1",
+              "path": "ir-hub/companies/OREP.PA/2024/transcripts/OREP.PA-04-06-24-EC-fy24q1.pdf",
+              "hash": "git:a76d62ed70c8d3229b774e72c5d3d645c334cc9b",
+              "pages": null
+            },
+            {
+              "doc_id": "orep-pa-2024-transc-orep-pa-05-08-24-ec-fy24",
+              "type": "transcript",
+              "title": "OREP.PA 05 08 24 EC fy24q2",
+              "path": "ir-hub/companies/OREP.PA/2024/transcripts/OREP.PA-05-08-24-EC-fy24q2.pdf",
+              "hash": "git:c495646e60fd963ab2a9da96ff565083b80d0a1c",
+              "pages": null
+            },
+            {
+              "doc_id": "orep-pa-2024-transc-orep-pa-07-02-25-ec-fy24",
+              "type": "transcript",
+              "title": "OREP.PA 07 02 25 EC fy24q4",
+              "path": "ir-hub/companies/OREP.PA/2024/transcripts/OREP.PA-07-02-25-EC-fy24q4.pdf",
+              "hash": "git:79b0228c11b6bd67a57b52ea8a0cf8da965b9133",
+              "pages": null
+            },
+            {
+              "doc_id": "orep-pa-2024-transc-orep-pa-18-04-24-ec-fy24",
+              "type": "transcript",
+              "title": "OREP.PA 18 04 24 EC fy24q1",
+              "path": "ir-hub/companies/OREP.PA/2024/transcripts/OREP.PA-18-04-24-EC-fy24q1.pdf",
+              "hash": "git:4adbb62105c688168794307294fef9dfa0edc5aa",
+              "pages": null
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
