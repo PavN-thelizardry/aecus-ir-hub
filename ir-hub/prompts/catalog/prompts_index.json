@@ -1,19 +1,5 @@
 [
   {
-    "id": "coverage",
-    "title": "Coverage & Chunk Notes",
-    "description": "Read every doc, split into ~1–2k token chunks, make 2–4 factual bullets per chunk.",
-    "prompt_url": "https://your-site/ir-hub/prompts/catalog/coverage.txt",
-    "output_schema": {
-      "type": "object",
-      "properties": {
-        "coverage_table": {"type": "array"},
-        "rollups": {"type": "array"},
-        "summary": {"type": "object"}
-      }
-    }
-  },
-  {
     "id": "pronoun",
     "title": "Pronoun Usage",
     "description": "Counts of first/third person by doc and speaker, plus snippets and interpretation.",
