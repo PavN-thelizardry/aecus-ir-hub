@@ -15,11 +15,10 @@ Prompts index:
 Steps:
 1. Parse the prompts_index.json. 
 2. For each prompt entry:
-   - Fetch its prompt body from the `url` field.
+   - Fetch its prompt body from the `prompt_url` field.
    - Execute the analysis exactly as defined, on the already-covered corpus.
    - Return the output in the format specified in the prompt.
 3. Clearly label each output block with the corresponding prompt_id.
-
 
 Output format:
 === Prompt: <prompt_id> ===
@@ -27,7 +26,6 @@ Output format:
 
 === Prompt: <next_prompt_id> ===
 <prompt output here>
-
 
 Rules:
 - Do NOT repeat coverage.
