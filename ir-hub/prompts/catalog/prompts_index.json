@@ -3,28 +3,28 @@
     "id": "pronoun",
     "title": "Pronoun Usage",
     "description": "Counts of first/third person by doc and speaker, plus snippets and interpretation.",
-    "prompt_url": "https://your-site/ir-hub/prompts/catalog/pronoun.txt",
+    "prompt_url": "https://pavn-thelizardry.github.io/aecus-ir-hub/ir-hub/prompts/catalog/pronoun.txt",
     "output_schema": {"type": "object"}
   },
   {
     "id": "temporal",
     "title": "Temporal Orientation",
     "description": "Past/present/future counts + samples + interpretation.",
-    "prompt_url": "https://your-site/ir-hub/prompts/catalog/temporal.txt",
+    "prompt_url": "https://pavn-thelizardry.github.io/aecus-ir-hub/ir-hub/prompts/catalog/temporal.txt",
     "output_schema": {"type": "object"}
   },
   {
     "id": "data_analytics",
     "title": "Data & Analytics Language",
     "description": "Keyword counts, meaningful snippets, domain mapping, interpretation.",
-    "prompt_url": "https://your-site/ir-hub/prompts/catalog/data_analytics.txt",
+    "prompt_url": "https://pavn-thelizardry.github.io/aecus-ir-hub/ir-hub/prompts/catalog/data_analytics.txt",
     "output_schema": {"type": "object"}
   },
   {
     "id": "macro",
     "title": "Macro/Political/Competitor References",
     "description": "Keyword counts, snippets, threat vs opportunity framing.",
-    "prompt_url": "https://your-site/ir-hub/prompts/catalog/macro.txt",
+    "prompt_url": "https://pavn-thelizardry.github.io/aecus-ir-hub/ir-hub/prompts/catalog/macro.txt",
     "output_schema": {"type": "object"}
   }
 ]
