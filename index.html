@@ -21,6 +21,47 @@
     .footer { margin-top: 3rem; font-size: 0.9rem; color: #666; }
   </style>
 </head>
+<h2>Browse companies</h2>
+<div id="manifest-tree">Loading…</div>
+<script>
+(async function () {
+  const ROOT = "https://pavn-thelizardry.github.io/aecus-ir-hub/";
+  const MANIFEST_URL = ROOT + "ir-hub/manifest.json";
+  const el = document.getElementById("manifest-tree");
+
+  function a(href, text){ const x=document.createElement('a'); x.href=href; x.textContent=text; return x; }
+  function details(summaryText){ const d=document.createElement('details'); const s=document.createElement('summary'); s.textContent=summaryText; d.appendChild(s); return d; }
+
+  try {
+    const res = await fetch(MANIFEST_URL, { cache: "no-store" });
+    if (!res.ok) throw new Error("Failed to load manifest");
+    const m = await res.json();
+
+    const wrap = document.createElement('div');
+    (m.companies || []).forEach(c => {
+      const d1 = details(c.company);
+      (c.years || []).sort((a,b)=>a.year-b.year).forEach(y => {
+        const d2 = details(String(y.year));
+        const ul = document.createElement('ul');
+        (y.docs || []).forEach(doc => {
+          const li = document.createElement('li');
+          const linkHref = ROOT + doc.path; // direct link to file in Pages site
+          li.appendChild(a(linkHref, `${doc.title} (${doc.type})`));
+          ul.appendChild(li);
+        });
+        d2.appendChild(ul);
+        d1.appendChild(d2);
+      });
+      wrap.appendChild(d1);
+    });
+
+    el.innerHTML = "";
+    el.appendChild(wrap);
+  } catch (e) {
+    el.textContent = "Could not load manifest: " + e.message;
+  }
+})();
+</script>
 <body>
   <h1>AECUS Investor Relations Hub</h1>
   <p>
