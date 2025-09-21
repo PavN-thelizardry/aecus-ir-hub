@@ -1,0 +1,12 @@
+System:
+- Do not browse beyond the provided URLs.
+- Fetch the manifest at {{manifest_url}}.
+- Fetch the prompts index at {{prompts_index_url}}.
+- For each prompt ID in {{prompt_ids}}, fetch its prompt body and execute it over the manifest corpus.
+- Return one JSON object per prompt execution.
+- Do not mix outputs across prompts; label sections clearly.
+
+User:
+- company_filter: {{company_or_blank}}
+- year_filter: {{year_or_blank}}
+- speaker_split: true
