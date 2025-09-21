@@ -71,8 +71,7 @@
     <div class="row">
       <label>Root URL (served): <input id="rootUrl" value="https://pavn-thelizardry.github.io/aecus-ir-hub/" size="40" /></label>
       <button id="btnBuild">Build manifest</button>
-      <button id="btnValidateUrls">Validate URLs</button>
-      <span id="urlCheckStatus" class="small"></span>
+      <button id="btnValidate">Validate</button>
       <button id="btnCommit">Commit to <code>ir-hub/manifest.json</code></button>
     </div>
     <div class="small">Doc IDs are auto-generated. Pages are <code>null</code> unless you compute them elsewhere.</div>
@@ -92,32 +91,6 @@
 </main>
 
 <script>
-  async function validateUrls() {
-  const txt = $('manifestOut').textContent.trim();
-  if (!txt) { alert('Build the manifest first'); return; }
-  const m = JSON.parse(txt);
-  const docs = m.companies.flatMap(c => c.years.flatMap(y => y.docs));
-  let ok=0, fail=0;
-
-  async function check(u){
-    try {
-      // HEAD often blocked on raw; fall back to GET with 'range' to keep it light
-      const r = await fetch(u, { method: 'GET', headers: { 'Range': 'bytes=0-64' } });
-      return r.ok;
-    } catch { return false; }
-  }
-
-  for (const d of docs) {
-    const good = (d.url_pages && await check(d.url_pages)) || (d.url_raw && await check(d.url_raw));
-    if (good) ok++; else fail++;
-  }
-  $('urlCheckStatus').innerHTML = (fail===0)
-    ? `<span class="ok">✔ All ${ok} URLs reachable</span>`
-    : `<span class="err">✖ ${fail} of ${ok+fail} docs unreachable — check paths/case/branch</span>`;
-}
-
-$('btnValidateUrls').onclick = validateUrls;
-
 const $ = (id)=>document.getElementById(id);
 
 let TREE = [];       // all repo files
