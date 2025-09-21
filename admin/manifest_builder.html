@@ -1,126 +1,350 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <title>IR Hub Manifest Builder</title>
-  <style>
-    body { font-family: system-ui, sans-serif; margin: 2rem; max-width: 1000px; }
-    textarea { width: 100%; height: 300px; }
-    button { margin: 0.25rem 0.5rem 0.25rem 0; }
-    .ok { color: green; }
-    .err { color: red; }
-    .small { font-size: 0.9em; color: #555; }
-    pre { background: #f6f8fa; padding: 1rem; border-radius: 6px; overflow-x: auto; }
-  </style>
+<meta charset="utf-8" />
+<title>AECUS IR Hub — Manifest Builder</title>
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<style>
+  :root { --bg:#0b1116; --fg:#e6edf3; --muted:#8b949e; --card:#161b22; --accent:#2f81f7; }
+  body { margin:0; font-family:system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif; background:var(--bg); color:var(--fg);}
+  header { padding:16px 20px; border-bottom:1px solid #30363d; }
+  main { max-width:1100px; margin:0 auto; padding:20px; }
+  h1 { font-size:1.4rem; margin:0 0 8px; }
+  .row { display:flex; gap:12px; flex-wrap:wrap; align-items:center; }
+  input, select, button, textarea { background:var(--card); color:var(--fg); border:1px solid #30363d; border-radius:8px; padding:8px 10px; }
+  input[type="checkbox"] { width:16px; height:16px; vertical-align:middle; }
+  button { cursor:pointer; }
+  section { background:var(--card); border:1px solid #30363d; border-radius:12px; padding:16px; margin:16px 0; }
+  .grid { display:grid; grid-template-columns: 1fr auto auto auto auto; gap:8px; align-items:center; }
+  .grid div { padding:6px 4px; border-bottom:1px dashed #30363d; }
+  .grid .head { font-weight:600; color:var(--muted); border-bottom:1px solid #30363d;}
+  .pill { font-size:12px; padding:2px 8px; border-radius:999px; border:1px solid #30363d; color:var(--muted);}
+  .ok { color:#2ea043; } .err { color:#ff7b72; }
+  pre { background:#0a0f14; border:1px solid #30363d; border-radius:8px; padding:12px; overflow:auto; }
+  .small { font-size:12px; color:var(--muted); }
+</style>
 </head>
 <body>
-  <h1>IR Hub Manifest Builder</h1>
-  <p>This tool scans the repository file tree and generates a <code>manifest.json</code> with absolute URLs.</p>
-
-  <div>
-    <label>Repo (owner/name): 
-      <input id="repo" value="pavn-thelizardry/aecus-ir-hub">
-    </label><br>
-    <label>Branch: 
-      <input id="branch" value="main">
-    </label>
+<header>
+  <h1>AECUS IR Hub — Manifest Builder</h1>
+  <div class="row">
+    <label>Repo (owner/repo): <input id="repo" value="pavn-thelizardry/aecus-ir-hub" size="28"></label>
+    <label>Branch: <input id="branch" value="main" size="10"></label>
+    <label>Root path: <input id="rootPath" value="ir-hub" size="10" /></label>
+    <label>GitHub Token: <input id="token" type="password" size="36" placeholder="fine-grained PAT (Contents:RW)" /></label>
+    <button id="btnLoad">Load files</button>
   </div>
+  <div class="small">Tip: create a fine-grained Personal Access Token with <em>Repository contents: Read &amp; Write</em>. Don’t hardcode it. Paste it here only while you use the page.</div>
+</header>
 
-  <div>
-    <button id="btnBuild">Build Manifest</button>
-    <button id="btnValidate">Validate URLs</button>
-    <span id="urlCheckStatus" class="small"></span>
-  </div>
+<main>
+  <section>
+    <div class="row">
+      <label>Filter company: <input id="filterCompany" placeholder="(optional) e.g. LOREAL" /></label>
+      <label>Filter year: <input id="filterYear" placeholder="(optional) e.g. 2024" /></label>
+      <label>Types:
+        <select id="typeFilter" multiple size="2">
+          <option value="reports" selected>reports</option>
+          <option value="transcripts" selected>transcripts</option>
+        </select>
+      </label>
+      <button id="btnApplyFilter">Apply filter</button>
+      <button id="btnSelectAll">Select all (visible)</button>
+      <button id="btnClearSelect">Clear selection</button>
+    </div>
+  </section>
 
-  <h2>Manifest Output</h2>
-  <pre id="manifestOut"></pre>
+  <section>
+    <h3>Repository files (companies/**/(reports|transcripts)/*)</h3>
+    <div class="grid" id="fileGrid">
+      <div class="head">Select</div>
+      <div class="head">Company / Year</div>
+      <div class="head">Type</div>
+      <div class="head">Filename</div>
+      <div class="head">Path</div>
+    </div>
+    <div id="status" class="small"></div>
+  </section>
 
-  <script>
-  const $ = id => document.getElementById(id);
+  <section>
+    <h3>Manifest preview</h3>
+    <div class="row">
+      <label>Root URL (served): <input id="rootUrl" value="https://pavn-thelizardry.github.io/aecus-ir-hub/" size="40" /></label>
+      <button id="btnBuild">Build manifest</button>
+      <button id="btnValidateSchema">Validate schema</button>
+      <button id="btnValidateUrls">Validate URLs</button>
+      <span id="urlCheckStatus" class="small"></span>
+      <button id="btnCommit">Commit to <code>ir-hub/manifest.json</code></button>
+    </div>
+    <div class="small">Doc IDs are auto-generated. Pages are <code>null</code> unless you compute them elsewhere.</div>
+    <pre id="manifestOut">(build to preview)</pre>
+    <div id="validateOut" class="small"></div>
+  </section>
 
-  // Helpers to guess metadata
-  function inferDocId(company, year, kind, filename) {
-    return `${company}-${year}-${kind}-${filename}`.replace(/\W+/g, '-').toLowerCase();
-  }
-  function guessTitle(filename) {
-    return filename.replace(/[_-]+/g, ' ').replace(/\.[^.]+$/, '');
-  }
+  <section>
+    <h3>Notes</h3>
+    <ul class="small">
+      <li>We read the repo tree via <code>GET /repos/:owner/:repo/git/trees/:branch?recursive=1</code> and filter file paths.</li>
+      <li>We use the <em>Git blob sha</em> as <code>hash</code> (stable unless content changes).</li>
+      <li>Commit uses <code>PUT /repos/:owner/:repo/contents/:path</code> with your token.</li>
+      <li>You can refine the <code>inferDocId()</code> function to enforce your exact ID rules.</li>
+    </ul>
+  </section>
+</main>
 
-  async function buildManifest() {
-    const [owner, repo] = $('repo').value.split('/');
-    const branch = $('branch').value.trim();
-    const treeUrl = `https://api.github.com/repos/${owner}/${repo}/git/trees/${encodeURIComponent(branch)}?recursive=1`;
+<script>
+const $ = (id)=>document.getElementById(id);
 
-    const res = await fetch(treeUrl, { headers: { Accept: "application/vnd.github+json" } });
-    if (!res.ok) { alert("Failed to fetch repo tree"); return; }
-    const j = await res.json();
+let TREE = [];      // all repo files
+let VISIBLE = [];     // filtered rows
+let SELECTED = new Set(); // selected paths
+let BLOB_SHA = new Map(); // path -> blob sha (for manifest.hash)
 
-    const files = (j.tree||[]).filter(n => 
-      n.type === "blob" &&
-      /^ir-hub\/companies\/[^/]+\/\d{4}\/(reports|transcripts)\/.+\.(pdf|txt)$/i.test(n.path)
-    );
+const ALLOWED_EXT = /\.(pdf|txt|html?)$/i;
 
-    const companies = {};
+function pathParts(path) {
+  // Expect: ir-hub/companies/COMPANY/YEAR/(reports|transcripts)/FILENAME
+  const m = path.match(/^([^/]+)\/companies\/([^/]+)\/(\d{4})\/(reports|transcripts)\/(.+)$/i);
+  if (!m) return null;
+  return { root: m[1], company: m[2], year: m[3], kind: m[4], filename: m[5] };
+}
 
-    files.forEach(f => {
-      const m = f.path.match(/^ir-hub\/companies\/([^/]+)\/(\d{4})\/(reports|transcripts)\/(.+)$/i);
-      if (!m) return;
-      const [_, company, year, kind, filename] = m;
-      if (!companies[company]) companies[company] = {};
-      if (!companies[company][year]) companies[company][year] = [];
+function slugify(s){ return s.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,''); }
 
-      companies[company][year].push({
-        doc_id: inferDocId(company, year, kind, filename),
-        type: kind === 'reports' ? 'report' : 'transcript',
-        title: guessTitle(filename),
-        path: f.path,
-        url_pages: `https://pavn-thelizardry.github.io/${repo}/${f.path}`,
-        url_raw: `https://raw.githubusercontent.com/${owner}/${repo}/${branch}/${f.path}`,
-        hash: f.sha ? `git:${f.sha}` : null,
-        pages: null
-      });
+function inferDocId(company, year, kind, filename) {
+  const stem = filename.replace(/\.[^.]+$/,'');
+  return `${slugify(company)}-${year}-${kind.slice(0,6)}-${slugify(stem).slice(0,24)}`;
+}
+
+function guessTitle(filename){
+  return filename.replace(/\.[^.]+$/,'').replace(/[_\-]+/g,' ').trim();
+}
+
+async function loadTree() {
+  const [owner, repo] = $('repo').value.split('/');
+  const branch = $('branch').value.trim();
+  const url = `https://api.github.com/repos/${owner}/${repo}/git/trees/${encodeURIComponent(branch)}?recursive=1`;
+  const res = await fetch(url, { headers: { Accept:"application/vnd.github+json" }});
+  if (!res.ok) { $('status').innerHTML = `<span class="err">Load failed: ${res.status}</span>`; return; }
+  const json = await res.json();
+  TREE = (json.tree || []).filter(n => n.type === 'blob');
+  // build path -> sha map
+  BLOB_SHA.clear();
+  for (const n of TREE) BLOB_SHA.set(n.path, n.sha);
+  $('status').innerHTML = `<span class="ok">Loaded ${TREE.length} blobs</span>`;
+  applyFilter();
+}
+
+function applyFilter() {
+  const rootPath = $('rootPath').value.replace(/\/+$/,''); // e.g. "ir-hub"
+  const comp = $('filterCompany').value.trim();
+  const year = $('filterYear').value.trim();
+  const types = Array.from($('typeFilter').selectedOptions).map(o=>o.value);
+  const pred = (p) => {
+    if (!p.startsWith(rootPath + '/companies/')) return false;
+    if (!ALLOWED_EXT.test(p)) return false;
+    const parts = pathParts(p);
+    if (!parts) return false;
+    if (comp && parts.company.toLowerCase() !== comp.toLowerCase()) return false;
+    if (year && parts.year !== year) return false;
+    if (!types.includes(parts.kind)) return false;
+    return true;
+  };
+  VISIBLE = TREE.filter(n => pred(n.path)).map(n => n.path);
+  renderGrid();
+}
+
+function renderGrid() {
+  const grid = $('fileGrid');
+  grid.innerHTML = `
+    <div class="head">Select</div>
+    <div class="head">Company / Year</div>
+    <div class="head">Type</div>
+    <div class="head">Filename</div>
+    <div class="head">Path</div>
+  `;
+  for (const p of VISIBLE) {
+    const parts = pathParts(p);
+    const id = 'cb-' + btoa(p).replace(/=/g,'');
+    const checked = SELECTED.has(p) ? 'checked' : '';
+    const row = document.createElement('div');
+    row.innerHTML = `
+      <div><input type="checkbox" id="${id}" ${checked}></div>
+      <div>${parts.company} <span class="pill">${parts.year}</span></div>
+      <div><span class="pill">${parts.kind}</span></div>
+      <div>${parts.filename}</div>
+      <div class="small">${p}</div>
+    `;
+    // we created just first cell; we need 5 grid cells; fix:
+    const cells = row.querySelectorAll('div');
+    grid.appendChild(cells[0]); grid.appendChild(cells[1]); grid.appendChild(cells[2]); grid.appendChild(cells[3]); grid.appendChild(cells[4]);
+    // wire checkbox
+    const cb = document.getElementById(id);
+    cb.addEventListener('change', (e)=> {
+      if (e.target.checked) SELECTED.add(p); else SELECTED.delete(p);
     });
+  }
+  $('status').innerHTML = `<span class="ok">Showing ${VISIBLE.length} files • Selected ${SELECTED.size}</span>`;
+}
 
-    const manifest = {
-      generated_at: new Date().toISOString(),
-      companies: Object.entries(companies).map(([company, years]) => ({
-        company,
-        years: Object.entries(years).map(([year, docs]) => ({
-          year,
-          docs
-        }))
-      }))
-    };
+function buildManifest() {
+  const rootServe = $('rootUrl').value.replace(/\/+$/,'/') || '';
+  const selected = Array.from(SELECTED);
+  const byCompany = new Map();
+  for (const p of selected) {
+    const parts = pathParts(p);
+    if (!parts) continue;
+    const key = parts.company;
+    if (!byCompany.has(key)) byCompany.set(key, new Map());
+    const yearsMap = byCompany.get(key);
+    if (!yearsMap.has(parts.year)) yearsMap.set(parts.year, []);
+    const docs = yearsMap.get(parts.year);
+    const normPath = p.replace(/\\/g,'/');
+    docs.push({
+      doc_id: inferDocId(parts.company, parts.year, parts.kind, parts.filename),
+      type: parts.kind === 'reports' ? 'report' : 'transcript',
+      title: guessTitle(parts.filename),
+      path: normPath,
+      url_pages: `${rootServe}${normPath}`,
+      url_raw:   `https://raw.githubusercontent.com/${$('repo').value}/${$('branch').value}/${normPath}`,
+      hash: BLOB_SHA.get(p) ? `git:${BLOB_SHA.get(p)}` : null,
+      pages: null
+    });
+  }
+  const companies = [];
+  for (const [company, yearsMap] of byCompany) {
+    const yearsArr = [];
+    for (const [yr, docs] of yearsMap) {
+      yearsArr.push({ year: parseInt(yr,10), docs });
+    }
+    yearsArr.sort((a,b)=>a.year-b.year);
+    companies.push({ company, years: yearsArr });
+  }
+  companies.sort((a,b)=>a.company.localeCompare(b.company));
+  const manifest = {
+    version: "1.0",
+    generated_at: new Date().toISOString(),
+    root: rootServe,
+    companies
+  };
+  $('manifestOut').textContent = JSON.stringify(manifest, null, 2);
+  $('validateOut').innerHTML = '';
+}
 
-    $('manifestOut').textContent = JSON.stringify(manifest, null, 2);
+async function validateManifest() {
+  try {
+    const obj = JSON.parse($('manifestOut').textContent || "{}");
+    // lightweight checks
+    if (!obj.version || !obj.generated_at || !obj.root || !Array.isArray(obj.companies)) throw new Error("Missing required top-level fields.");
+    for (const c of obj.companies) {
+      if (!c.company || !Array.isArray(c.years)) throw new Error("Company entry malformed.");
+      for (const y of c.years) {
+        if (typeof y.year !== "number" || !Array.isArray(y.docs)) throw new Error("Year entry malformed.");
+        for (const d of y.docs) {
+          const required = ["doc_id","type","title","path","hash"];
+          for (const f of required) {
+            if (!d[f]) throw new Error(`Doc missing field: ${f}`);
+          }
+          if (!d.url_pages && !d.url_raw) {
+            throw new Error("Doc missing url_pages and url_raw (need at least one)");
+          }
+        }
+      }
+    }
+    $('validateOut').innerHTML = '<span class="ok">✔ Basic validation passed</span>';
+  } catch (e) {
+    $('validateOut').innerHTML = `<span class="err">✖ ${e.message}</span>`;
+  }
+}
+
+async function validateUrls() {
+  const txt = $('manifestOut').textContent.trim();
+  if (!txt || txt === '(build to preview)') { alert('Build the manifest first'); return; }
+
+  let manifest;
+  try { manifest = JSON.parse(txt); }
+  catch (e) { $('urlCheckStatus').innerHTML = `<span class="err">Invalid JSON in preview</span>`; return; }
+
+  // Flatten all docs
+  const docs = (manifest.companies || []).flatMap(c =>
+    (c.years || []).flatMap(y => y.docs || [])
+  );
+
+  if (!docs.length) {
+    $('urlCheckStatus').innerHTML = `<span class="err">No docs in manifest</span>`;
+    return;
   }
 
-  async function validateUrls() {
-    const txt = $('manifestOut').textContent.trim();
-    if (!txt) { alert("Build the manifest first"); return; }
-    const m = JSON.parse(txt);
-    const docs = m.companies.flatMap(c => c.years.flatMap(y => y.docs));
+  $('urlCheckStatus').innerHTML = `Checking ${docs.length} docs...`;
 
-    let ok = 0, fail = 0;
-    async function check(u) {
-      try {
-        const r = await fetch(u, { method: 'GET', headers: { 'Range': 'bytes=0-64' } });
-        return r.ok;
-      } catch { return false; }
-    }
-
-    for (const d of docs) {
-      const good = (d.url_pages && await check(d.url_pages)) || (d.url_raw && await check(d.url_raw));
-      if (good) ok++; else fail++;
-    }
-
-    $('urlCheckStatus').innerHTML = (fail===0)
-      ? `<span class="ok">✔ All ${ok} URLs reachable</span>`
-      : `<span class="err">✖ ${fail} of ${ok+fail} docs unreachable — check paths/case/branch</span>`;
+  async function quickCheck(url) {
+    if (!url) return false;
+    try {
+      // HEAD is often blocked on raw; use a tiny GET with Range
+      const r = await fetch(url, { method: 'GET', headers: { 'Range': 'bytes=0-64' } });
+      return r.ok;
+    } catch { return false; }
   }
 
-  $('btnBuild').onclick = buildManifest;
-  $('btnValidate').onclick = validateUrls;
-  </script>
+  let ok = 0, fail = 0;
+  for (const d of docs) {
+    const good = (await quickCheck(d.url_pages)) || (await quickCheck(d.url_raw));
+    if (good) ok++; else fail++;
+  }
+
+  $('urlCheckStatus').innerHTML = (fail === 0)
+    ? `<span class="ok">✔ All ${ok} document URLs reachable</span>`
+    : `<span class="err">✖ ${fail} of ${ok + fail} documents unreachable — check paths/case/branch</span>`;
+}
+
+async function commitManifest() {
+  const token = $('token').value.trim();
+  if (!token) { alert("Provide a GitHub token"); return; }
+  const [owner, repo] = $('repo').value.split('/');
+  const path = $('rootPath').value.replace(/\/+$/,'') + '/manifest.json';
+  const branch = $('branch').value.trim();
+  const content = $('manifestOut').textContent;
+  if (!content || content === '(build to preview)') { alert("Build the manifest first"); return; }
+
+  // fetch current sha (if file exists)
+  let sha = undefined;
+  const getUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${encodeURIComponent(path)}?ref=${encodeURIComponent(branch)}`;
+  const getRes = await fetch(getUrl, { headers: { Accept:"application/vnd.github+json" }});
+  if (getRes.ok) {
+    const j = await getRes.json();
+    sha = j.sha;
+  }
+
+  const putUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${encodeURIComponent(path)}`;
+  const res = await fetch(putUrl, {
+    method: 'PUT',
+    headers: {
+      Authorization: `Bearer ${token}`,
+      Accept: "application/vnd.github+json"
+    },
+    body: JSON.stringify({
+      message: "chore: update ir-hub/manifest.json via Manifest Builder",
+      content: btoa(unescape(encodeURIComponent(content))),
+      sha,
+      branch
+    })
+  });
+  if (!res.ok) {
+    const t = await res.text();
+    alert("Commit failed: " + res.status + "\n" + t);
+    return;
+  }
+  alert("Committed manifest.json ✅");
+}
+
+$('btnLoad').onclick = loadTree;
+$('btnApplyFilter').onclick = applyFilter;
+$('btnSelectAll').onclick = ()=>{ VISIBLE.forEach(p=>SELECTED.add(p)); renderGrid(); };
+$('btnClearSelect').onclick = ()=>{ SELECTED.clear(); renderGrid(); };
+$('btnBuild').onclick = buildManifest;
+$('btnValidateSchema').onclick = validateManifest;
+$('btnValidateUrls').onclick = validateUrls;
+$('btnCommit').onclick = commitManifest;
+</script>
 </body>
 </html>
