@@ -75,6 +75,7 @@
       <button id="btnValidateUrls">Validate URLs</button>
       <span id="urlCheckStatus" class="small"></span>
       <button id="btnCommit">Commit to <code>ir-hub/manifest.json</code></button>
+      <button id="btnGenerateResources">Generate ir-hub/resources.html</button><span id="resourcesStatus" class="small"></span>
     </div>
     <div class="small">Doc IDs are auto-generated. Pages are <code>null</code> unless you compute them elsewhere.</div>
     <pre id="manifestOut">(build to preview)</pre>
@@ -337,6 +338,111 @@ async function commitManifest() {
   alert("Committed manifest.json ✅");
 }
 
+async function generateResources() {
+  const token = $('token').value.trim();
+  if (!token) { alert("Provide a GitHub token"); return; }
+  const [owner, repo] = $('repo').value.split('/');
+  const branch = $('branch').value.trim();
+
+  const txt = $('manifestOut').textContent.trim();
+  if (!txt || txt === '(build to preview)') {
+    alert('Build the manifest first'); 
+    return;
+  }
+  let manifest;
+  try { manifest = JSON.parse(txt); }
+  catch { $('resourcesStatus').innerHTML = '<span class="err">Invalid manifest JSON</span>'; return; }
+
+  // Flatten docs
+  const docs = (manifest.companies || []).flatMap(c =>
+    (c.years || []).flatMap(y =>
+      (y.docs || []).map(d => ({
+        company: c.company,
+        year: y.year,
+        ...d
+      }))
+    )
+  );
+
+  // Build a static HTML page with clickable links and data attributes (doc_id, path)
+  const groups = new Map(); // key = `${company}|${year}`
+  for (const d of docs) {
+    const key = `${d.company}|${d.year}`;
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key).push(d);
+  }
+
+  const esc = (s) => String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+  let body = `
+<!doctype html>
+<meta charset="utf-8">
+<title>IR Hub Resources</title>
+<style>
+  body{font-family:system-ui,sans-serif;max-width:1000px;margin:2rem auto;line-height:1.5}
+  h1{margin:0 0 1rem}
+  h2{margin:1.5rem 0 .5rem;font-size:1.1rem}
+  .muted{color:#666}
+  code{background:#f6f8fa;padding:.15em .35em;border-radius:4px}
+  ul{margin:.25rem 0 1rem 1.25rem}
+  li{margin:.15rem 0}
+  .pill{font-size:12px;border:1px solid #ddd;padding:.1rem .4rem;border-radius:999px;margin-left:.5rem;color:#666}
+</style>
+<h1>IR Hub Resources</h1>
+<p class="muted">Clickable links to all documents from the current manifest. 
+AI agents: match by <code>data-doc-id</code> or filename text, then click to open.</p>
+`;
+
+  const sortedGroups = [...groups.entries()].sort((a,b)=>a[0].localeCompare(b[0]));
+  for (const [key, arr] of sortedGroups) {
+    const [company, year] = key.split('|');
+    body += `<h2>${esc(company)} • ${esc(year)}</h2>\n<ul>\n`;
+    arr.sort((a,b) => String(a.type).localeCompare(String(b.type)) || String(a.title).localeCompare(String(b.title)));
+    for (const d of arr) {
+      // Prefer url_pages, fallback to url_raw, else construct from root + path
+      const href = d.url_pages || d.url_raw || (manifest.root ? (manifest.root.replace(/\/+$/,'/') + d.path) : d.path);
+      const label = `${d.type}: ${d.title}`;
+      body += `<li>
+  <a href="${esc(href)}" target="_blank" 
+     data-doc-id="${esc(d.doc_id)}" 
+     data-path="${esc(d.path)}"
+     rel="noopener noreferrer">${esc(label)}</a>
+  <span class="pill">${esc(d.doc_id)}</span>
+</li>\n`;
+    }
+    body += `</ul>\n`;
+  }
+
+  // Commit the HTML to ir-hub/resources.html
+  const path = 'ir-hub/resources.html';
+
+  // get current sha if exists
+  const getUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${encodeURIComponent(path)}?ref=${encodeURIComponent(branch)}`;
+  const headers = { Authorization: `Bearer ${token}`, Accept: "application/vnd.github+json" };
+  let sha = undefined;
+  const getRes = await fetch(getUrl, { headers });
+  if (getRes.ok) {
+    const j = await getRes.json();
+    sha = j.sha;
+  }
+
+  const putUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${encodeURIComponent(path)}`;
+  const res = await fetch(putUrl, {
+    method: 'PUT',
+    headers,
+    body: JSON.stringify({
+      message: "chore: generate ir-hub/resources.html from manifest",
+      content: btoa(unescape(encodeURIComponent(body))),
+      sha,
+      branch
+    })
+  });
+  if (!res.ok) {
+    $('resourcesStatus').innerHTML = `<span class="err">Commit failed: ${res.status}</span>`;
+    return;
+  }
+  $('resourcesStatus').innerHTML = `<span class="ok">✔ Wrote ir-hub/resources.html</span>`;
+}
+
 $('btnLoad').onclick = loadTree;
 $('btnApplyFilter').onclick = applyFilter;
 $('btnSelectAll').onclick = ()=>{ VISIBLE.forEach(p=>SELECTED.add(p)); renderGrid(); };
@@ -345,6 +451,7 @@ $('btnBuild').onclick = buildManifest;
 $('btnValidateSchema').onclick = validateManifest;
 $('btnValidateUrls').onclick = validateUrls;
 $('btnCommit').onclick = commitManifest;
+$('btnGenerateResources').onclick = generateResources;
 </script>
 </body>
 </html>
