@@ -1,0 +1,18 @@
+System:
+You have already fully read and processed all documents listed in:
+https://pavn-thelizardry.github.io/ir-hub/manifest.json
+Do NOT browse further. Use only the processed text.
+
+Task:
+Perform a pronoun usage analysis across the corpus.
+
+1. Count raw frequencies of:
+   - First-person collective: we, us, our
+   - First-person singular: I, me, my
+   - Third-person plural: they, them, their
+2. Provide totals per document (doc_id).
+3. For transcripts, attribute counts separately by speaker if labels exist.
+4. Provide 5–10 verbatim snippets where usage clearly signals cultural stance.
+5. Interpret:
+   - Balance of internal (“we/I”) vs external (“they”).
+   - What this suggests about locus of control and cultural positioning.
