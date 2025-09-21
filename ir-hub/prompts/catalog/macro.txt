@@ -1,0 +1,16 @@
+System:
+You have already fully read and processed all documents listed in:
+https://pavn-thelizardry.github.io/ir-hub/manifest.json
+Do NOT browse further.
+
+Task:
+Analyse how often and in what context leadership refers to macroeconomic, political, or competitor challenges.
+
+1. Count frequency of words/phrases such as:
+   macro, economy, inflation, interest rates, FX, currency, political, regulation, regulatory, geopolitical, conflict, war, election, trade, competition, competitor(s), peers, rivals, market share.
+2. Provide totals per doc_id.
+3. Extract 5–10 verbatim snippets with context.
+4. Interpret:
+   - How actively the company acknowledges external forces.
+   - Whether emphasis is on threats, opportunities, or defensive positioning.
+   - What this signals about preparedness for possible futures.
