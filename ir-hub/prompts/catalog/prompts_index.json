@@ -1,0 +1,44 @@
+[
+  {
+    "id": "coverage",
+    "title": "Coverage & Chunk Notes",
+    "description": "Read every doc, split into ~1–2k token chunks, make 2–4 factual bullets per chunk.",
+    "prompt_url": "https://your-site/ir-hub/prompts/catalog/coverage.txt",
+    "output_schema": {
+      "type": "object",
+      "properties": {
+        "coverage_table": {"type": "array"},
+        "rollups": {"type": "array"},
+        "summary": {"type": "object"}
+      }
+    }
+  },
+  {
+    "id": "pronoun",
+    "title": "Pronoun Usage",
+    "description": "Counts of first/third person by doc and speaker, plus snippets and interpretation.",
+    "prompt_url": "https://your-site/ir-hub/prompts/catalog/pronoun.txt",
+    "output_schema": {"type": "object"}
+  },
+  {
+    "id": "temporal",
+    "title": "Temporal Orientation",
+    "description": "Past/present/future counts + samples + interpretation.",
+    "prompt_url": "https://your-site/ir-hub/prompts/catalog/temporal.txt",
+    "output_schema": {"type": "object"}
+  },
+  {
+    "id": "data_analytics",
+    "title": "Data & Analytics Language",
+    "description": "Keyword counts, meaningful snippets, domain mapping, interpretation.",
+    "prompt_url": "https://your-site/ir-hub/prompts/catalog/data_analytics.txt",
+    "output_schema": {"type": "object"}
+  },
+  {
+    "id": "macro",
+    "title": "Macro/Political/Competitor References",
+    "description": "Keyword counts, snippets, threat vs opportunity framing.",
+    "prompt_url": "https://your-site/ir-hub/prompts/catalog/macro.txt",
+    "output_schema": {"type": "object"}
+  }
+]
