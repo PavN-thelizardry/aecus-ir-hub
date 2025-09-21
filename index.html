@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>AECUS IR Hub</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      margin: 2rem auto;
+      max-width: 900px;
+      line-height: 1.5;
+      color: #222;
+    }
+    h1 { font-size: 1.8rem; margin-bottom: 0.5rem; }
+    h2 { font-size: 1.2rem; margin-top: 2rem; }
+    a { color: #0366d6; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    code { background: #f6f8fa; padding: 0.2em 0.4em; border-radius: 4px; }
+    ul { margin-top: 0.5rem; }
+    .footer { margin-top: 3rem; font-size: 0.9rem; color: #666; }
+  </style>
+</head>
+<body>
+  <h1>AECUS Investor Relations Hub</h1>
+  <p>
+    Welcome to the <strong>IR Hub</strong>.  
+    This site hosts structured investor-relations documents, prompts, and the
+    machine-readable <code>manifest.json</code> that drives the AECUS analysis pipeline.
+  </p>
+
+  <h2>Key Resources</h2>
+  <ul>
+    <li><a href="ir-hub/manifest.json">📄 manifest.json</a> — primary source of truth for all documents</li>
+    <li><a href="ir-hub/prompts/catalog/prompts_index.json">⚙️ prompts_index.json</a> — list of analysis prompts</li>
+    <li><a href="ir-hub/">📂 ir-hub/ folder</a> — browse companies, years, and documents</li>
+  </ul>
+
+  <h2>Repository Layout</h2>
+  <pre>
+ir-hub/
+  companies/
+    [COMPANY]/
+      [YEAR]/
+        reports/
+        transcripts/
+  prompts/
+    catalog/
+      prompts_index.json
+      [prompt].txt
+    scripts/
+  tools/
+    manifest_gen.py
+  manifest.json
+  README.md
+  </pre>
+
+  <p>
+    To add new documents: place them under <code>companies/[COMPANY]/[YEAR]/</code> and 
+    regenerate the manifest with <code>tools/manifest_gen.py</code>.
+  </p>
+
+  <h2>Next Steps</h2>
+  <ul>
+    <li>Use the manifest as input to AI prompts for coverage and analysis.</li>
+    <li>Prompts are shared across companies (see <code>prompts/catalog/</code>).</li>
+    <li>Outputs are generated on the AI side, not stored in this repo.</li>
+  </ul>
+
+  <div class="footer">
+    <p>⚡ AECUS IR Hub • Generated for internal research and cultural-metrics analysis.</p>
+  </div>
+</body>
+</html>
