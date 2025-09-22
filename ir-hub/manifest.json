@@ -1,8 +1,28 @@
 {
   "version": "1.0",
-  "generated_at": "2025-09-21T18:19:34.873Z",
+  "generated_at": "2025-09-22T14:10:20.810Z",
   "root": "https://pavn-thelizardry.github.io/aecus-ir-hub/",
   "companies": [
+    {
+      "company": "EL.N",
+      "years": [
+        {
+          "year": 2024,
+          "docs": [
+            {
+              "doc_id": "el-n-2024-transc-el-n-29-05-24-ec-fy24q1",
+              "type": "transcript",
+              "title": "EL.N 29 05 24 EC fy24q1",
+              "path": "ir-hub/companies/EL.N/2024/transcripts/EL.N-29-05-24-EC-fy24q1.pdf",
+              "url_pages": "https://pavn-thelizardry.github.io/aecus-ir-hub/ir-hub/companies/EL.N/2024/transcripts/EL.N-29-05-24-EC-fy24q1.pdf",
+              "url_raw": "https://raw.githubusercontent.com/pavn-thelizardry/aecus-ir-hub/main/ir-hub/companies/EL.N/2024/transcripts/EL.N-29-05-24-EC-fy24q1.pdf",
+              "hash": "git:9b78f751039c8923d22da96c213050496daf8d0b",
+              "pages": null
+            }
+          ]
+        }
+      ]
+    },
     {
       "company": "OREP.PA",
       "years": [
@@ -17,36 +37,6 @@
               "url_pages": "https://pavn-thelizardry.github.io/aecus-ir-hub/ir-hub/companies/OREP.PA/2024/transcripts/OREP.PA-04-06-24-EC-fy24q1.pdf",
               "url_raw": "https://raw.githubusercontent.com/pavn-thelizardry/aecus-ir-hub/main/ir-hub/companies/OREP.PA/2024/transcripts/OREP.PA-04-06-24-EC-fy24q1.pdf",
               "hash": "git:a76d62ed70c8d3229b774e72c5d3d645c334cc9b",
-              "pages": null
-            },
-            {
-              "doc_id": "orep-pa-2024-transc-orep-pa-05-08-24-ec-fy24",
-              "type": "transcript",
-              "title": "OREP.PA 05 08 24 EC fy24q2",
-              "path": "ir-hub/companies/OREP.PA/2024/transcripts/OREP.PA-05-08-24-EC-fy24q2.pdf",
-              "url_pages": "https://pavn-thelizardry.github.io/aecus-ir-hub/ir-hub/companies/OREP.PA/2024/transcripts/OREP.PA-05-08-24-EC-fy24q2.pdf",
-              "url_raw": "https://raw.githubusercontent.com/pavn-thelizardry/aecus-ir-hub/main/ir-hub/companies/OREP.PA/2024/transcripts/OREP.PA-05-08-24-EC-fy24q2.pdf",
-              "hash": "git:c495646e60fd963ab2a9da96ff565083b80d0a1c",
-              "pages": null
-            },
-            {
-              "doc_id": "orep-pa-2024-transc-orep-pa-07-02-25-ec-fy24",
-              "type": "transcript",
-              "title": "OREP.PA 07 02 25 EC fy24q4",
-              "path": "ir-hub/companies/OREP.PA/2024/transcripts/OREP.PA-07-02-25-EC-fy24q4.pdf",
-              "url_pages": "https://pavn-thelizardry.github.io/aecus-ir-hub/ir-hub/companies/OREP.PA/2024/transcripts/OREP.PA-07-02-25-EC-fy24q4.pdf",
-              "url_raw": "https://raw.githubusercontent.com/pavn-thelizardry/aecus-ir-hub/main/ir-hub/companies/OREP.PA/2024/transcripts/OREP.PA-07-02-25-EC-fy24q4.pdf",
-              "hash": "git:79b0228c11b6bd67a57b52ea8a0cf8da965b9133",
-              "pages": null
-            },
-            {
-              "doc_id": "orep-pa-2024-transc-orep-pa-18-04-24-ec-fy24",
-              "type": "transcript",
-              "title": "OREP.PA 18 04 24 EC fy24q1",
-              "path": "ir-hub/companies/OREP.PA/2024/transcripts/OREP.PA-18-04-24-EC-fy24q1.pdf",
-              "url_pages": "https://pavn-thelizardry.github.io/aecus-ir-hub/ir-hub/companies/OREP.PA/2024/transcripts/OREP.PA-18-04-24-EC-fy24q1.pdf",
-              "url_raw": "https://raw.githubusercontent.com/pavn-thelizardry/aecus-ir-hub/main/ir-hub/companies/OREP.PA/2024/transcripts/OREP.PA-18-04-24-EC-fy24q1.pdf",
-              "hash": "git:4adbb62105c688168794307294fef9dfa0edc5aa",
               "pages": null
             }
           ]
